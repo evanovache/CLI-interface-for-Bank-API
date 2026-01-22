@@ -11,8 +11,9 @@ public class ConsoleMenu {
         
         while(true) {
             System.out.println("\n=== APEX BANK ===");
-            System.out.println("1. Ping API");
-            System.out.println("0. Exit");
+            System.out.println("1. Ping");
+            System.out.println("2. Login");
+            System.out.println("3. Exit");
             System.out.print("Choose option: ");
 
             int choice = in.nextInt();
@@ -22,7 +23,10 @@ public class ConsoleMenu {
                 case 1:
                     pingApi();
                     break;
-                case 0:
+                case 2:
+                    login();
+                    break;
+                case 3:
                     System.out.println("Goodbye!!");
                     return;
                 default:
@@ -35,5 +39,25 @@ public class ConsoleMenu {
         String response = apiClient.ping();
         System.out.println("Response from API: ");
         System.out.println(response);
+    }
+
+    private void login() {
+        System.out.print("Email: ");
+        String email = in.nextLine();
+
+        System.out.print("Password: " );
+        String password = in.nextLine();
+
+        ApiResponse response = apiClient.login(email,password);
+
+        if (response.getStatusCode() == 200) {
+            System.out.println("Login Successful");
+            System.out.println("User data: ");
+            System.out.println(response.getBody());
+        } else {
+            System.out.println("Login failed");
+            System.out.println("Status: " + response.getStatusCode());
+            System.out.println("Message: " + response.getBody());
+        }
     }
 }
