@@ -14,7 +14,7 @@ public class ApiClient {
     public String ping() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                            .uri(URI.create(BASE_URL + "/apex-bank/api"))
+                            .uri(URI.create(BASE_URL + "/apex-bank/api/ping"))
                             .GET()
                             .build();
 
@@ -27,6 +27,5 @@ public class ApiClient {
         } catch (Exception e) {
             return "Error calling API: " + e.getMessage();
         }
-
     }
 }
