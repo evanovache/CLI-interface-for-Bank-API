@@ -4,13 +4,16 @@ import java.util.Scanner;
 
 import com.etz.cli.client.AuthClient;
 import com.etz.cli.client.HealthTest;
+import com.etz.cli.client.UserClient;
 import com.etz.cli.http.ApiResponse;
 import com.etz.cli.model.User;
 import com.etz.dto.ErrorResponse;
+import com.etz.dto.SignUpRequest;
 
 public class ConsoleMenu {
     
     private final AuthClient authClient = new AuthClient();
+    private final UserClient userClient = new UserClient();
     private final HealthTest hClient = new HealthTest();
     private final Scanner in = new Scanner(System.in);
 
@@ -36,8 +39,26 @@ public class ConsoleMenu {
                 case 2 -> {
                     login();
                     enter();
+                    System.out.println("1. View Accounts");
+                    System.out.println("2. Create New Account");
+                    choice = in.nextInt();
+                    in.nextLine();
+                        switch(choice) {
+                            case 1 -> {
+
+                            }
+
+                            case 2 -> {
+                                
+                            }
+                        }
                 }
-                    
+                
+                case 3 -> {
+                    signUp();
+                    enter();
+                }
+
                 case 4 -> {
                     System.out.println("Goodbye!!");
                     return;
@@ -57,6 +78,7 @@ public class ConsoleMenu {
         System.out.println(response);
     }
 
+
     private void login() throws Exception {
         System.out.print("Email: ");
         String email = in.nextLine();
@@ -72,6 +94,26 @@ public class ConsoleMenu {
         } else {
             ErrorResponse error = response.getError();
             System.out.println(error.getError());
+        }
+    }
+
+
+    private void signUp() throws Exception {
+        SignUpRequest req = new SignUpRequest();
+        System.out.print("Enter full name: ");
+        req.setFullName(in.nextLine());
+        System.out.print("Enter email: ");
+        req.setEmail(in.nextLine());
+        System.out.print("Enter password: ");
+        req.setPassword(in.nextLine());
+        
+        ApiResponse response = userClient.signUp(req);
+
+        if (response.isSuccess()) {
+            User user = response.getData();
+            System.out.println("Sign Up Successful.");
+            System.out.println("Name: " + user.getFullName());
+            System.out.println("Email: " + user.getEmail());
         }
     }
 

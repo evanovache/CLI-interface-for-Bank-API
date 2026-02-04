@@ -15,8 +15,8 @@ public class ApiResponse {
         this.error = error;
     }
 
-    public static  ApiResponse success(User data) {
-        return new ApiResponse (200, data, null);
+    public static  ApiResponse user(int statusCode, User data) {
+        return new ApiResponse (statusCode, data, null);
     }
 
     public static ApiResponse error(int statusCode, ErrorResponse error) {

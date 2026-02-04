@@ -33,7 +33,7 @@ public class AuthClient {
 
             if (response.statusCode() == 200) {
                 User user = mapper.readValue(response.body(), User.class);
-                return ApiResponse.success(user);
+                return ApiResponse.user(response.statusCode(), user);
             }
 
             ErrorResponse error = mapper.readValue(response.body(), ErrorResponse.class);
