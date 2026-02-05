@@ -10,6 +10,7 @@ import com.etz.cli.http.HttpClientProvider;
 import com.etz.cli.model.User;
 import com.etz.dto.ErrorResponse;
 import com.etz.dto.LoginRequest;
+import com.etz.dto.Pin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class AuthClient {
@@ -43,6 +44,27 @@ public class AuthClient {
         } catch (Exception e) {
         ErrorResponse error = new ErrorResponse("Client error: " + e.getMessage());
         return ApiResponse.error(500, error);
+        }
+    }
+
+    public void validatePin(long accountNumber, String pin) {
+        try {
+            Pin p = new Pin(pin);
+            String json = mapper.writeValueAsString(p); 
+            
+            HttpRequest request = HttpRequest.newBuilder() 
+                            .uri(URI.create(ApiConfig.BASE_URL + "/accounts/" + accountNumber + "/validate"))
+                            .header("Content-Type", "application/json") 
+                            .POST(HttpRequest.BodyPublishers.ofString(json))
+                            .build();
+
+            HttpResponse<String> response = HttpClientProvider.getClient() 
+                        .send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 401) 
+                throw new IllegalArgumentException("Invalid Pin");
+        } catch (Exception e) {
+            System.out.println("Validation Failed");
         }
     }
 }
