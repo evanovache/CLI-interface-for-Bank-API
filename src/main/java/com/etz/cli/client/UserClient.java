@@ -3,20 +3,24 @@ package com.etz.cli.client;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.etz.cli.config.ApiConfig;
 import com.etz.cli.http.ApiResponse;
 import com.etz.cli.http.HttpClientProvider;
 import com.etz.cli.model.User;
+import com.etz.dto.Account;
 import com.etz.dto.ErrorResponse;
 import com.etz.dto.SignUpRequest;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class UserClient {
     
     private ObjectMapper mapper = new ObjectMapper();
 
-    public ApiResponse signUp(SignUpRequest request) throws Exception {
+    public ApiResponse signUp(SignUpRequest request) {
         try {
             String json = mapper.writeValueAsString(request);
 
@@ -42,4 +46,41 @@ public class UserClient {
             return ApiResponse.error(500, error);
         }        
     }
+
+
+    public List<ApiResponse> listAccounts(int id) {
+        List<ApiResponse> res = new ArrayList<>();
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                                             .uri(URI.create(ApiConfig.BASE_URL + "/users/" + id + "/accounts"))
+                                             .GET()
+                                             .build();
+
+            HttpResponse<String> response = HttpClientProvider.getClient()
+                                            .send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                List<Account> list = mapper.readValue(response.body(), 
+                        new TypeReference<List<Account>>() {});
+                
+                for (Account s: list) {                    
+                    res.add(ApiResponse.account(s));
+                }
+        
+                return res;
+            }
+
+            ErrorResponse error = mapper.readValue(response.body(), ErrorResponse.class);
+            res.add(ApiResponse.error(400, error));
+            return res;
+
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse("Client error: " + e.getMessage());
+            res.add(ApiResponse.error(500, error));
+            return res;
+        }
+    } 
+
+
+    public ApiResponse 
 }

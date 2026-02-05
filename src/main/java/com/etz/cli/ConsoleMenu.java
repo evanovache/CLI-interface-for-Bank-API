@@ -1,5 +1,6 @@
 package com.etz.cli;
 
+import java.util.List;
 import java.util.Scanner;
 
 import com.etz.cli.client.AuthClient;
@@ -7,6 +8,7 @@ import com.etz.cli.client.HealthTest;
 import com.etz.cli.client.UserClient;
 import com.etz.cli.http.ApiResponse;
 import com.etz.cli.model.User;
+import com.etz.dto.Account;
 import com.etz.dto.ErrorResponse;
 import com.etz.dto.SignUpRequest;
 
@@ -37,7 +39,7 @@ public class ConsoleMenu {
                 }
 
                 case 2 -> {
-                    login();
+                    int id = login();
                     enter();
                     System.out.println("1. View Accounts");
                     System.out.println("2. Create New Account");
@@ -45,11 +47,12 @@ public class ConsoleMenu {
                     in.nextLine();
                         switch(choice) {
                             case 1 -> {
-
+                                listAccounts(id);
+                                enter();
                             }
 
                             case 2 -> {
-                                
+
                             }
                         }
                 }
@@ -79,7 +82,7 @@ public class ConsoleMenu {
     }
 
 
-    private void login() throws Exception {
+    private int login() throws Exception {
         System.out.print("Email: ");
         String email = in.nextLine();
 
@@ -91,9 +94,11 @@ public class ConsoleMenu {
         if (response.isSuccess()) {
             User user = response.getData();
             System.out.println("Welcome " + user.getFullName());
+            return user.getUserId();
         } else {
             ErrorResponse error = response.getError();
             System.out.println(error.getError());
+            return 0;
         }
     }
 
@@ -114,11 +119,36 @@ public class ConsoleMenu {
             System.out.println("Sign Up Successful.");
             System.out.println("Name: " + user.getFullName());
             System.out.println("Email: " + user.getEmail());
+        } else {
+            ErrorResponse error = response.getError();
+            System.out.println(error.getError());
         }
     }
+
+    private void listAccounts(int id) {
+        List<ApiResponse> response = userClient.listAccounts(id);
+        if (response.isEmpty())
+            System.out.println("You have no accounts");
+
+        for (ApiResponse a: response) {
+
+            if (!a.isSuccess()) {
+                System.out.println("Error: " + a.getError().getError());
+                continue;
+            }
+
+            Account account = a.getAccount();
+            System.out.println("Account Number: " + account.getAccountNumber());
+            System.out.println("Account Type: " + account.getAccountType());
+            System.out.println();
+        }
+    }
+
+    
 
     private void enter() {
         System.out.print("Press Enter To Continue: ");
         in.nextLine();
     }
 }
+

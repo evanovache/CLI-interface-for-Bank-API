@@ -2,17 +2,17 @@ package com.etz.cli.model;
 
 public class User {
     
-    private Long userId;
+    private int userId;
     private String email;
     private String fullName;
 
     public User() {}
 
-    public Long getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 
