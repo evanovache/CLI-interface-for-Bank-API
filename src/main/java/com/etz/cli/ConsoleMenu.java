@@ -7,8 +7,10 @@ import com.etz.cli.client.AuthClient;
 import com.etz.cli.client.HealthTest;
 import com.etz.cli.client.UserClient;
 import com.etz.cli.http.ApiResponse;
+import com.etz.cli.model.AccountType;
 import com.etz.cli.model.User;
 import com.etz.dto.Account;
+import com.etz.dto.CreateAccountRequest;
 import com.etz.dto.ErrorResponse;
 import com.etz.dto.SignUpRequest;
 
@@ -40,7 +42,11 @@ public class ConsoleMenu {
 
                 case 2 -> {
                     int id = login();
-                    enter();
+                    if (id == 0) {
+                        enter();
+                        break;
+                    }
+                    
                     System.out.println("1. View Accounts");
                     System.out.println("2. Create New Account");
                     choice = in.nextInt();
@@ -52,7 +58,8 @@ public class ConsoleMenu {
                             }
 
                             case 2 -> {
-
+                                createAccount(id);
+                                enter();
                             }
                         }
                 }
@@ -125,6 +132,7 @@ public class ConsoleMenu {
         }
     }
 
+
     private void listAccounts(int id) {
         List<ApiResponse> response = userClient.listAccounts(id);
         if (response.isEmpty())
@@ -144,11 +152,60 @@ public class ConsoleMenu {
         }
     }
 
-    
+
+    private void createAccount(int id) {
+        System.out.println("1. Savings Account");
+        System.out.println("2. Current Account");
+        int choice = in.nextInt();
+        in.nextLine();
+        AccountType type = switch(choice) {
+            case 1 -> AccountType.SAVINGS;
+            case 2 -> AccountType.CURRENT;
+            default -> {
+                throw new IllegalArgumentException("Invalid Choice");
+            }
+        };
+
+        double initialDeposit;
+        System.out.println("Enter Initial Deposit: ");
+        do {
+            initialDeposit = in.nextDouble();
+            in.nextLine();
+
+            if (initialDeposit < 50)
+                System.out.println("Amount must be $50 or more");
+        } while (initialDeposit < 50);
+
+        System.out.print("Enter a four digit pin: ");
+        String pin;
+        do {
+            pin = in.nextLine();
+            if (pin.length() != PINLENGTH) 
+                System.out.println("Pin Must be 4 digits!!");
+        } while (pin.length() != PINLENGTH); 
+
+        CreateAccountRequest request = new CreateAccountRequest(
+                                        type, initialDeposit, pin);
+        
+        ApiResponse response = userClient.createAccount(request, id);
+
+        if (response.isSuccess()) {
+            System.out.println("Account Created Successfully");
+            Account account = response.getAccount();
+            System.out.println("Account Number: " + account.getAccountNumber());
+            System.out.println("Account Type: " + account.getAccountType());
+            System.out.println("Account Type: " + account.getBalance());
+        } else {
+            ErrorResponse error = response.getError();
+            System.out.println(error.getError());
+        }
+    }
 
     private void enter() {
         System.out.print("Press Enter To Continue: ");
         in.nextLine();
     }
+
+    private final int PINLENGTH = 4;
 }
 

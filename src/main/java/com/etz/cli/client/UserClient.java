@@ -11,6 +11,7 @@ import com.etz.cli.http.ApiResponse;
 import com.etz.cli.http.HttpClientProvider;
 import com.etz.cli.model.User;
 import com.etz.dto.Account;
+import com.etz.dto.CreateAccountRequest;
 import com.etz.dto.ErrorResponse;
 import com.etz.dto.SignUpRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -60,11 +61,11 @@ public class UserClient {
                                             .send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
-                List<Account> list = mapper.readValue(response.body(), 
+                List<Account> accounts = mapper.readValue(response.body(), 
                         new TypeReference<List<Account>>() {});
                 
-                for (Account s: list) {                    
-                    res.add(ApiResponse.account(s));
+                for (Account account: accounts) {                    
+                    res.add(ApiResponse.account(account));
                 }
         
                 return res;
@@ -82,5 +83,30 @@ public class UserClient {
     } 
 
 
-    public ApiResponse 
+     public ApiResponse createAccount(CreateAccountRequest req, int id) {
+        try {
+            String json = mapper.writeValueAsString(req);
+
+            HttpRequest request = HttpRequest.newBuilder() 
+                                    .uri(URI.create(ApiConfig.BASE_URL + "/users/" + id + "/accounts"))
+                                    .header("Content-Type", "application/json")
+                                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                                    .build();
+                                
+            HttpResponse<String> response = HttpClientProvider.getClient() 
+                                            .send(request, HttpResponse.BodyHandlers.ofString()); 
+
+            if (response.statusCode() == 201) {
+                Account account = mapper.readValue(response.body(), Account.class);
+                return ApiResponse.account(account);
+            }
+
+            ErrorResponse error = mapper.readValue(response.body(), ErrorResponse.class);
+            return ApiResponse.error(400, error);
+
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse("Client Error: " + e.getMessage());
+            return ApiResponse.error(500, error);
+        }
+     }
 }
