@@ -267,7 +267,7 @@ public class ConsoleMenu {
             Account account = response.getAccount();
             System.out.println("Account Number: " + account.getAccountNumber());
             System.out.println("Account Type: " + account.getAccountType());
-            System.out.println("Account Type: " + account.getBalance());
+            System.out.println("Amount: " + account.getBalance());
         } else {
             ErrorResponse error = response.getError();
             System.out.println(error.getError());
