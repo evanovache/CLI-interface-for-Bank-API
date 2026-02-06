@@ -31,6 +31,7 @@ public class ConsoleMenu {
     public void start() throws Exception {
         
         while(true) {
+            clearScreen();
             System.out.println("\n=== APEX BANK ===");
             System.out.println("1. Ping");
             System.out.println("2. Login");
@@ -53,15 +54,18 @@ public class ConsoleMenu {
                         enter();
                         break;
                     }
-                    
-                    System.out.println("1. View Accounts");
-                    System.out.println("2. Create New Account");
-                    System.out.println("3. Logout");
-                    System.out.print("Enter Option: ");
-                    choice = in.nextInt();
-                    in.nextLine();
+                    while (true) {
+                        clearScreen();
+                        System.out.println("1. View Accounts");
+                        System.out.println("2. Create New Account");
+                        System.out.println("3. Logout");
+                        System.out.print("Enter Option: ");
+                        choice = in.nextInt();
+                        in.nextLine();
                         switch(choice) {
                             case 1 -> {
+                                clearScreen();
+                                System.out.println("******YOUR ACCOUNTS*******");
                                 List<Account> accounts = listAccounts(id);
                                 if (accounts.isEmpty()) {
                                     enter();
@@ -73,33 +77,44 @@ public class ConsoleMenu {
                                 in.nextLine();
                                 Account account = accounts.get(choice - 1);
                                 long accountNumber = account.getAccountNumber(); 
-                                System.out.println("1. Check Balance");
-                                System.out.println("2. Deposit");
-                                System.out.println("3. Withdraw");
-                                System.out.println("4. Mini Statement");
-                                System.out.println("5. Go back");
-                                System.out.print("Enter Option: ");
-                                choice = in.nextInt();
-                                in.nextLine();
+                                while (true) {
+                                    clearScreen();
+                                    System.out.print("Account Number: " + accountNumber);
+                                    System.out.println("\t\t(" + account.getAccountType() + " ACCOUNT)");
+                                    System.out.println("1. Check Balance");
+                                    System.out.println("2. Deposit");
+                                    System.out.println("3. Withdraw");
+                                    System.out.println("4. Mini Statement");
+                                    System.out.println("5. Go back");
+                                    System.out.print("Enter Option: ");
+                                    choice = in.nextInt();
+                                    in.nextLine();
 
-                                switch(choice) {
-                                    case 1 -> {
-                                        checkBalance(accountNumber);
-                                    }
+                                    switch(choice) {
+                                        case 1 -> {
+                                            checkBalance(accountNumber);
+                                        }
 
-                                    case 2 -> {
-                                        deposit(accountNumber);
-                                    }
+                                        case 2 -> {
+                                            deposit(accountNumber);
+                                        }
 
-                                    case 3 -> {
-                                        withdraw(accountNumber);
-                                    }
+                                        case 3 -> {
+                                            withdraw(accountNumber);
+                                        }
 
-                                    case 4 -> {
-                                        miniStatement(accountNumber);
+                                        case 4 -> {
+                                            miniStatement(accountNumber);
+                                        }
+
+                                        case 5 -> {
+                                            
+                                        }
                                     }
-                                }
-                                enter();                               
+                                    enter(); 
+                                    if (choice == 5) 
+                                        break;
+                                }                             
                             }
 
                             case 2 -> {
@@ -111,6 +126,9 @@ public class ConsoleMenu {
                                 break;
                             }
                         }
+                        if (choice == 3) 
+                            break;
+                    }
                 }
                 
                 case 3 -> {
@@ -335,11 +353,11 @@ public class ConsoleMenu {
             }
 
             MiniStatement statement = a.getMiniStatement();
+            System.out.println();
             System.out.println("Transaction Id: " + statement.getTransactionId());
             System.out.println("Transaction Type: " + statement.getTransactionType());
             System.out.println("Amount: " + statement.getAmount());
             System.out.println("Time: " + statement.getTimeOfTransaction());
-            System.out.println();
         }
     }
 
@@ -347,6 +365,11 @@ public class ConsoleMenu {
     private void enter() {
         System.out.print("Press Enter To Continue: ");
         in.nextLine();
+    }
+
+    public void clearScreen() {
+    System.out.print("\033[H\033[2J");
+    System.out.flush();
     }
 
     private final int PINLENGTH = 4;
