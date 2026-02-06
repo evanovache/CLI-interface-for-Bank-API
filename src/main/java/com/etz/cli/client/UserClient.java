@@ -8,11 +8,11 @@ import java.util.List;
 
 import com.etz.cli.config.ApiConfig;
 import com.etz.cli.http.ApiResponse;
+import com.etz.cli.http.ErrorResponse;
 import com.etz.cli.http.HttpClientProvider;
 import com.etz.cli.model.User;
 import com.etz.dto.Account;
 import com.etz.dto.CreateAccountRequest;
-import com.etz.dto.ErrorResponse;
 import com.etz.dto.SignUpRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

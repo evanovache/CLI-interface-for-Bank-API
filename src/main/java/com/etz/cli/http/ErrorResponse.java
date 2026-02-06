@@ -1,4 +1,4 @@
-package com.etz.dto;
+package com.etz.cli.http;
 
 public class ErrorResponse {
     

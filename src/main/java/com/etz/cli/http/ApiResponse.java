@@ -2,7 +2,6 @@ package com.etz.cli.http;
 
 import com.etz.cli.model.User;
 import com.etz.dto.Account;
-import com.etz.dto.ErrorResponse;
 
 public class ApiResponse {
     

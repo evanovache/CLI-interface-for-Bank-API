@@ -6,9 +6,9 @@ import java.net.http.HttpResponse;
 
 import com.etz.cli.config.ApiConfig;
 import com.etz.cli.http.ApiResponse;
+import com.etz.cli.http.ErrorResponse;
 import com.etz.cli.http.HttpClientProvider;
 import com.etz.cli.model.User;
-import com.etz.dto.ErrorResponse;
 import com.etz.dto.LoginRequest;
 import com.etz.dto.Pin;
 import com.fasterxml.jackson.databind.ObjectMapper;

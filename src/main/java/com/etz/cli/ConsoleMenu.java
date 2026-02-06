@@ -10,12 +10,13 @@ import com.etz.cli.client.HealthTest;
 import com.etz.cli.client.UserClient;
 import com.etz.cli.http.AccountResponse;
 import com.etz.cli.http.ApiResponse;
+import com.etz.cli.http.ErrorResponse;
 import com.etz.cli.model.AccountType;
+import com.etz.cli.model.MiniStatement;
 import com.etz.cli.model.User;
 import com.etz.dto.Account;
 import com.etz.dto.Balance;
 import com.etz.dto.CreateAccountRequest;
-import com.etz.dto.ErrorResponse;
 import com.etz.dto.SignUpRequest;
 import com.etz.dto.TransactionRequest;
 
@@ -88,6 +89,14 @@ public class ConsoleMenu {
 
                                     case 2 -> {
                                         deposit(accountNumber);
+                                    }
+
+                                    case 3 -> {
+                                        withdraw(accountNumber);
+                                    }
+
+                                    case 4 -> {
+                                        miniStatement(accountNumber);
                                     }
                                 }
                                 enter();                               
@@ -262,6 +271,7 @@ public class ConsoleMenu {
         }
     }
 
+
     private void deposit(long accountNumber) {
         System.out.print("Enter amount: ");
         double amount = in.nextDouble();
@@ -281,6 +291,58 @@ public class ConsoleMenu {
             System.out.println(error.getError());
         }
     }
+
+
+    private void withdraw(long accountNumber) {
+        System.out.print("Enter amount: ");
+        double amount = in.nextDouble();
+        in.nextLine();
+        System.out.print("Enter Pin: ");
+        String pin = in.nextLine();
+
+        TransactionRequest request = new TransactionRequest(pin, amount);
+        AccountResponse response = accountClient.withdraw(accountNumber, request);
+
+        if (response.isSuccess()) {
+            Balance balance = response.getBalance(); 
+            System.out.println("Withdraw Successful");
+            System.out.println("Balance: " + balance.getBalance()); 
+        } else {
+            ErrorResponse error = response.getError();
+            System.out.println(error.getError());
+        }
+    }
+
+
+    private void miniStatement(long accountNumber) {
+        System.out.print("Enter number of recent transactions you want to view: ");
+        int limit = in.nextInt();
+        in.nextLine();
+        System.out.print("Enter pin: ");
+        String pin = in.nextLine();
+
+        List<AccountResponse> response = accountClient.listMiniStatement(accountNumber, pin, limit);
+        if(response.isEmpty()) {
+            System.out.println("You have no transaction history");
+            return;
+        }
+            
+        for (AccountResponse a: response) {
+            if (!a.isSuccess()) {
+                ErrorResponse error = a.getError();
+                System.out.println(error.getError());
+                return;
+            }
+
+            MiniStatement statement = a.getMiniStatement();
+            System.out.println("Transaction Id: " + statement.getTransactionId());
+            System.out.println("Transaction Type: " + statement.getTransactionType());
+            System.out.println("Amount: " + statement.getAmount());
+            System.out.println("Time: " + statement.getTimeOfTransaction());
+            System.out.println();
+        }
+    }
+
 
     private void enter() {
         System.out.print("Press Enter To Continue: ");
